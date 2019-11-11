@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Модель Ходжкина-Хаксли</title>
+    <style>
+      html, body {
+        padding: 0px;
+        margin: 0px;
+        font-size: 14px;
+        font-family: sans-serif;
+        height: 100%;
+      }
+      #header {
+        background: #597DA3;
+        color: #FFFFFF;
+        font-size: 20px;
+        font-weight: bold;
+        height: 55px;
+        line-height: 55px;
+        text-align: center;
+        margin: 0;
+      }
+      #main {
+        display: flex;
+        flex-direction: row;
+        min-height: calc(100% - 55px);
+      }
+      #params {
+        padding: 10px;
+        width: 120px;
+      }
+      #history {
+        min-width: 240px;
+        max-width: 240px;
+        padding: 10px;
+        margin-left: auto;
+        border-left: 2px solid black;
+      }
+      #center {
+        padding: 20px 10px 10px 10px;
+      }
+      p {
+        margin: 5px 0;
+        line-height: 1.2;
+      }
+      h2 {
+        font-size: 18px;
+        font-weight: bold;
+        text-decoration: underline;
+        text-align: center;
+      }
+      input {
+        box-sizing: border-box;
+        display: block;
+        border: 1px solid #aaa;
+        padding: 5px;
+        width: 100%;
+        font-size: 14px;
+      }
+      input[type=submit] {
+        margin: 10px 0;
+        background: #597DA3;
+        color: #FFFFFF;
+        font-weight: bold;
+      }
+      #hist {
+        padding-right: 35px;
+      }
+      #hist li {
+        vertical-align: middle;
+        margin-bottom: 5px;
+      }
+      #hist img {
+        vertical-align: middle;
+        width: 100%;
+        transition: transform 1s;
+      }
+      
+      img.zoom {
+		transform: scale(3, 3) translateX(-25px);
+		transform: scale(3, 3) translateX(-25px) translateY(25px);
+	}
+<!--
+      img.zoom {
+        transform: scale(3, 3) translateX(-25px);
+        z-index: 1;
+      }
+-->
+    </style>
+  </head>
+  <body>
+    <h1 id="header">Модель Ходжкина-Хаксли</h1>
+    <div id="main">
+      <div id="params" class="ib">
+        <h2>Параметры</h2>
+        <form action="/plot.png" id="form">
+          <p>Емкость мембраны С_m, uF/cm^2:</p>
+          <input type="text" name="cm" value="1.0">
+          <p>Максимальная проводимость Na-канала G_Na, mS/cm^2:</p>
+          <input type="text" name="gna" value="120.0">
+          <p>Максимальная проводимость K-канала G_K, mS/cm^2:</p>
+          <input type="text" name="gk" value="36.0">
+          <p>Проводимость каналов утечки G_L, mS/cm^2::</p>
+          <input type="text" name="gl" value="0.3">
+          <p>Потенциал Нернста для Na V_Na, mV:</p>
+          <input type="text" name="ena" value="50.0">
+          <p>Потенциал Нернста для K V_K, mV:</p>
+          <input type="text" name="ek" value="-77.0">
+          <p>Потенциал Нернста для утечки V_L, mV:</p>
+          <input type="text" name="el" value="-54.387">
+          <input type="submit" value="Построить">
+        </form>
+      </div>
+      <div id="center">
+        <p>Модель Ходжкина-Хаксли — математическая модель(система дифференциальных уравнений), описывающая генерацию и распространение потенциалов действия в нейронах.</p>
+        <p>Модель была разработана Аланом Ллойдом Ходжкином и Эндрю Хаксли в 1952 году для описания электрических механизмов, которые обусловливают генерацию и передачу нервного сигнала в гигантском аксоне кальмара. Авторы модели получили Нобелевскую премию в области физиологии и медицины за 1963 год.</p>
+        <p>Данная модель рассматривает каждый вид потенциал-зависимого ионного канала n в мембране как источник ЭДС E_n, проводимость каждого такого канала g_n является потенциал-время-зависимой величиной. Каналы мембранных пор отвечают за пассивную проводимость g_L(индекс L означает англ. leak — «течь, утечка») и являются исотчником ЭДС E_L. Самой же мембране соответствует конденсатор с емкостью С_m. Ионные транспортёры, осуществляющие перенос ионов напрямую за счет запасенной в клетке энергии, соответствуют источникам тока I_p. В данной программе они не учитываются. Эквивалентная электрическая схема нейрона:</p>
+        <p style="text-align:center"><Img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Hodgkin-Huxley.jpg/350px-Hodgkin-Huxley.jpg" Width="380" Height="250"></p> 
+        <p>В случае, если имеются два вида потенциал-зависимых ионных каналов: натриевый и калиевый(основные в гигантском аксооне кальмара), ток, текущий через мембрану:</p>
+        <Img src="https://upload.wikimedia.org/math/0/a/4/0a40dd385ad9546d4722cccacd11120b.png" style="vertical-align: middle;">       где V_m — мембранный потенциал </p>
+        <p>Основная сложность модели заключается в том, что проводимость  потенциал-зависимого ионного канала имеет сложную зависимость, в том числе и от мембранного потенциала. Ходжкину и Хаскли удалось преодолеть эту и другие сложности и на основе экспериментальных данных построить модель, достаточно точно описывающую процесс элекрогенеза в нейроне.</p>
+        <p>Более подробно здесь: <a href="https://en.wikipedia.org/wiki/Hodgkin–Huxley_model">https://en.wikipedia.org/wiki/Hodgkin–Huxley_model</a>
+        <p style="text-align:center"><img id="plot"></p>
+      </div>
+      <div id="history">
+        <h2>История</h2>
+        <ol id="hist"></ol>
+      </div>
+    </div>
+    <script>
+      var form = document.getElementById("form");
+      var plot = document.getElementById("plot");
+      var hist = document.getElementById("hist");
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        var params = [];
+        var inputs = form.querySelectorAll("input[type=text]");
+        var i, l = inputs.length;
+        for (i = 0; i < l; i++) {
+          params.push(inputs[i].getAttribute("name") + "=" + inputs[i].value);
+        }
+        var url = "/plot.png?" + params.join("&");
+        var li = document.createElement("li");
+        //li.innerHTML = "<img src='" + url + "'>";
+        li.innerHTML = "<img src='" + url + "'><p>" + params.join(" ") + "</p>";
+        hist.appendChild(li);
+        plot.src = url;
+      });
+      document.addEventListener("click", function (e) {
+        var zoomed = document.querySelector("img.zoom");
+        if (zoomed) {
+          zoomed.className = "";
+        }
+        var target = e.target;
+        if (target.parentNode.parentNode.id === "hist") {
+          target.className = "zoom";
+        }
+      });
+    </script>
+  </body>
+</html>
